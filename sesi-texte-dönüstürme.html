@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ses-Metin Dönüştürücü</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            text-align: center;
+            background-color: #c1b6e9;
+            font-family: Arial, sans-serif;
+        }
+
+        #start-btn {
+            background-color: green;
+            color: white;
+            border-radius: 10px;
+            width: 110px;
+            height: 70px;
+
+        }
+
+        #start-btn:hover {
+            background-color: #1add1a;
+            width: 110px;
+            height: 70px;
+        }
+
+        #stop-btn {
+            background-color: red;
+            color: white;
+            border-radius: 10px;
+            width: 110px;
+            height: 70px;
+        }
+
+        #stop-btn:hover {
+            background-color: #fd0505;
+            width: 110px;
+            height: 70px;
+        }
+
+        #clear-btn, #edit-btn {
+            background-color: #ffc107;
+            color: black;
+            border-radius: 10px;
+            width: 110px;
+            height: 70px;
+        }
+         #edit-btn {
+            background-color: #eb6b16;
+            color: black;
+            border-radius: 10px;
+            width: 110px;
+            height: 70px;
+        }
+
+        #clear-btn:hover, #edit-btn:hover {
+            background-color: #ffcd38;
+            width: 110px;
+            height: 70px;
+        }
+        #edit-btn:hover {
+            background-color: #a74d12;
+            width: 110px;
+            height: 70px;
+        }
+
+        #print-btn {
+            background-color: #4d4c4c;
+            color: white;
+            border-radius: 10px;
+            width: 110px;
+            height: 70px;
+        }
+
+        #print-btn:hover {
+            background-color: #6c757d;
+            width: 110px;
+            height: 70px;
+        }
+
+        .kutu1 {
+            margin: 20px auto;
+            padding: 15px;
+            border: 2px dashed #6c757d;
+            width: 80%;
+            min-height: 100px;
+            background-color: white;
+            border-radius: 5px;
+        }
+
+        #output, #edit-area {
+            color: black;
+            text-align: left;
+            white-space: pre-wrap;
+            width: 100%;
+            
+        }
+
+        #edit-area {
+            display: none;
+            border: 1px solid #6c757d;
+            padding: 10px;
+            border-radius: 5px;
+            min-height: 100px;
+            
+        }
+    </style>
+</head>
+<body>
+    <h1>Sesinizi Metne Dönüştürün</h1>
+    <p id="status">Dinlemeye hazır...</p>
+    <div>
+        <button id="start-btn" class="btn btn-lg">Dinlemeyi Başlat</button>
+        <button id="stop-btn" class="btn btn-lg">Dinlemeyi Durdur</button>
+        <button id="clear-btn" class="btn btn-lg">Metni Temizle</button>
+        <button id="edit-btn" class="btn btn-lg">Metni Düzenle</button>
+        <button id="print-btn" class="btn btn-lg" onclick="window.print()">Sayfayı Yazdır</button>
+    </div>
+    <div class="kutu1">
+        <p id="output">Metin burada görünecek...</p>
+        <textarea id="edit-area"></textarea>
+    </div>
+
+    <script>
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const editBtn = document.getElementById('edit-btn');
+        const output = document.getElementById('output');
+        const editArea = document.getElementById('edit-area');
+        const status = document.getElementById('status');
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+
+        recognition.lang = 'tr-TR';
+        recognition.continuous = true; // Sürekli dinleme
+        recognition.interimResults = true; // Geçici sonuçları gösterme
+
+        // Dinlemeyi başlatma
+        startBtn.addEventListener('click', () => {
+            recognition.start();
+            status.textContent = "Dinleniyor...";
+            output.style.border = "2px solid #007bff";
+        });
+
+        // Dinlemeyi durdurma
+        stopBtn.addEventListener('click', () => {
+            recognition.stop();
+            status.textContent = "Dinleme durduruldu.";
+            output.style.border = "2px dashed #6c757d";
+        });
+
+        // Metni temizleme
+        clearBtn.addEventListener('click', () => {
+            output.textContent = "Metin burada görünecek...";
+            editArea.value = "";
+            status.textContent = "Dinlemeye hazır...";
+        });
+
+        // Tanıma sırasında sonuçları güncelle
+        recognition.onresult = (event) => {
+            let transcript = '';
+            for (let i = 0; i < event.results.length; i++) {
+                transcript += event.results[i][0].transcript + ' ';
+            }
+            output.textContent = "Metin: " + transcript;
+        };
+
+        // Düzenleme modu
+        editBtn.addEventListener('click', () => {
+            if (editArea.style.display === "none") {
+                editArea.style.display = "block";
+                output.style.display = "none";
+                editArea.value = output.textContent;
+                editBtn.textContent = "Düzenlemeyi Kaydet";
+            } else {
+                editArea.style.display = "none";
+                output.style.display = "block";
+                output.textContent = editArea.value;
+                editBtn.textContent = "Metni Düzenle";
+            }
+        });
+
+        // Hata durumunda
+        recognition.onerror = (event) => {
+            status.textContent = 'Bir hata oluştu: ' + event.error;
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

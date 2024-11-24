@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Uygulaması</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: gray;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 0.5em;
+            background-color: rgb(90, 83, 83);
+            padding: 10px 20px;
+            border-radius: 15px;
+            color: white;
+        }
+
+        #timer {
+            font-size: 3em;
+            margin-bottom: 1em;
+            background-color: yellow;
+            border-radius: 50px;
+            height: 60px;
+            width: 130px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #status {
+            font-size: 1.5em;
+            margin-bottom: 1em;
+            color: white;
+        }
+
+        #completed-sessions {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: white;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 30px;
+            border: none;
+            margin: 5px;
+            color: white;
+        }
+
+        #start-btn {
+            background-color: green;
+        }
+
+        #pause-btn {
+            background-color: orange;
+        }
+
+        #reset-btn {
+            background-color: red;
+        }
+
+        #status.working {
+            color: yellow;
+        }
+
+        #status.break {
+            color: lightgreen;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pomodoro Uygulaması</h1>
+    <div id="status" class="working">Çalışma Zamanı</div>
+    <div id="timer">30:00</div>
+    <div>
+        <button id="start-btn" onclick="startPomodoro()">Başlat</button>
+        <button id="pause-btn" onclick="pausePomodoro()">Duraklat</button>
+        <button id="reset-btn" onclick="resetPomodoro()">Sıfırla</button>
+    </div>
+    <div id="completed-sessions">Tamamlanan Çalışma Süreleri: 0</div>
+
+    <script>
+        let timer;
+        let isWorking = true; // Çalışma mı mola mı
+        let minutes = 30;
+        let seconds = 0;
+        let isPaused = false;
+        let completedSessions = 0; // Tamamlanan 30 dakikalık çalışma süreleri
+
+        function updateDisplay() {
+            // Zamanı biçimlendir ve ekranda göster
+            document.getElementById("timer").innerText = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+            // Durum göstergesini güncelle
+            const statusElement = document.getElementById("status");
+            if (isWorking) {
+                statusElement.textContent = "Çalışma Zamanı";
+                statusElement.className = "working";
+            } else {
+                statusElement.textContent = "Mola Zamanı";
+                statusElement.className = "break";
+            }
+        }
+
+        function startPomodoro() {
+            if (isPaused) {
+                isPaused = false; // Duraklatma durumundan devam eder
+                return;
+            }
+
+            timer = setInterval(() => {
+                if (seconds === 0) {
+                    if (minutes === 0) {
+                        clearInterval(timer); // Zamanlayıcıyı durdur
+                        if (isWorking) {
+                            completedSessions++; // Tamamlanan çalışma süresini artır
+                            document.getElementById("completed-sessions").textContent = 
+                                `Tamamlanan Çalışma Süreleri: ${completedSessions}`;
+                        }
+                        isWorking = !isWorking; // Çalışma/mola durumunu değiştir
+                        minutes = isWorking ? 30 : 10; // Süreleri yeniden ayarla
+                        seconds = 0;
+                        alert(isWorking ? "Mola bitti! Çalışma zamanı." : "Çalışma bitti! Mola zamanı.");
+                        updateDisplay();
+                        startPomodoro();
+                        return;
+                    } else {
+                        minutes--; // Bir dakika azalt
+                        seconds = 59;
+                    }
+                } else {
+                    seconds--; // Bir saniye azalt
+                }
+                updateDisplay();
+            }, 1000);
+        }
+
+        function pausePomodoro() {
+            clearInterval(timer); // Zamanlayıcıyı durdur
+            isPaused = true;
+        }
+
+        function resetPomodoro() {
+            clearInterval(timer); // Zamanlayıcıyı durdur
+            isWorking = true;
+            minutes = 30;
+            seconds = 0;
+            isPaused = false;
+            completedSessions = 0; // Tamamlanan çalışma sürelerini sıfırla
+            document.getElementById("completed-sessions").textContent = 
+                `Tamamlanan Çalışma Süreleri: ${completedSessions}`;
+            updateDisplay();
+        }
+
+        updateDisplay(); // Başlangıç durumu
+    </script>
+</body>
+</html>

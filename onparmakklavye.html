@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelime Sayacı ve Oyun</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #b8aeae;
+        }
+
+        #kelimeler {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 20px 0;
+            color: red;
+        }
+
+        textarea {
+            width: 50%;
+            height: 100px;
+            font-size: 1.2em;
+            border-radius: 6px;
+        }
+
+        #sonuc, #sure {
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+
+        #start-btn {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #start-btn:hover {
+            background-color: darkgreen;
+        }
+    </style>
+</head>
+<body>
+    <h2>Kelime Sayacı ve Oyun</h2>
+    <div id="kelimeler">Hazır mısınız? Başlamak için butona tıklayın.</div>
+    <textarea id="metin" placeholder="Kelimeyi yazın ve Enter'a basın..." disabled></textarea>
+    <p id="sonuc">Doğru Kelime Sayısı: 0</p>
+    <p id="sure">Kalan Süre: 60 saniye</p>
+    <button id="start-btn" onclick="baslat()">Başlat</button>
+
+    <script>
+        const kelimeListesi = ["bir", "armut", "muz", "hafta", "kiraz", "kavun", "karpuz", "şeftali", "ayva", "silgi", "odun", "meltem", "yatak", "leylek", "ali", "kaldırım", "kaşık", "karkakoç", "öğütvermez", "ardahan", "yusuf", "çimento", "inek", "taş", "gün", "selam", "alkış", "şemsiye", "kiremit", "çatı", "ovarlok", "şelale", "zenim", "ütü", "ben", "ortalama", "monitör", "kavak", "durak", "gök", "gitar"];
+        let dogruSayisi = 0;
+        let kalanSure = 30;
+        let zamanlayici;
+        let aktifKelime;
+
+        const kelimeGoster = document.getElementById("kelimeler");
+        const metinGiris = document.getElementById("metin");
+        const sonucGoster = document.getElementById("sonuc");
+        const sureGoster = document.getElementById("sure");
+
+        function rastgeleKelimeGetir() {
+            const rastgeleIndex = Math.floor(Math.random() * kelimeListesi.length);
+            aktifKelime = kelimeListesi[rastgeleIndex];
+            kelimeGoster.innerText = aktifKelime;
+        }
+
+        function baslat() {
+            dogruSayisi = 0;
+            kalanSure = 60;
+            metinGiris.value = "";
+            sonucGoster.innerText = "Doğru Kelime Sayısı: 0";
+            sureGoster.innerText = "Kalan Süre: 60 saniye";
+
+            rastgeleKelimeGetir();
+            metinGiris.disabled = false;
+            metinGiris.focus();
+
+            zamanlayici = setInterval(() => {
+                kalanSure--;
+                sureGoster.innerText = "Kalan Süre: " + kalanSure + " saniye";
+
+                if (kalanSure === 0) {
+                    bitir();
+                }
+            }, 1000);
+
+            metinGiris.addEventListener("input", kontrolEt);
+        }
+
+        function kontrolEt() {
+            const girilenMetin = metinGiris.value.trim();
+
+            if (girilenMetin === aktifKelime) {
+                dogruSayisi++;
+                sonucGoster.innerText = "Doğru Kelime Sayısı: " + dogruSayisi;
+
+                metinGiris.value = "";
+                rastgeleKelimeGetir();
+            }
+        }
+
+        function bitir() {
+            clearInterval(zamanlayici);
+            kelimeGoster.innerText = "Süre doldu! Doğru kelime sayınız: " + dogruSayisi;
+            metinGiris.disabled = true;
+            metinGiris.removeEventListener("input", kontrolEt);
+        }
+    </script>
+</body>
+</html>
