@@ -33,6 +33,225 @@
             }
         }
     </script>
-     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-</body>
-</html>
+     
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+
+
+   
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+        <style>
+            body {
+                text-align: center;
+                background-color: rgb(0, 0, 146);
+                background-image: url('optik1.jpg');
+                background-repeat: no-repeat;
+                background-size: cover;
+                background-position: center;
+                
+                
+            }
+            #output {
+                margin-top: 10px;
+                border: 4px solid rgb(99, 203, 255);
+                display: inline-block;
+                background-color: white;
+                text-align: left;
+                padding: 5px;
+                color: red;
+                border-radius: 5px;
+           
+              
+            }
+           
+            .group-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 10px;
+                text-align: center;
+            }
+            .group-column {
+                margin-bottom: 20px;
+            }
+           
+            .group p {
+                margin: 2px 0;
+            }
+            #jpg {
+        position: fixed; 
+        bottom: 20px;  
+        right: 20px;     
+        padding: 20px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    input{
+        border-radius: 50px;
+    }
+    #isaret{
+        background-color: rgb(154, 255, 255);
+        margin-left: 420px;
+        margin-right: 420px;
+        border-radius: 50px;
+    
+    }
+    
+        </style>
+    </head>
+    <body>
+        <div>
+        <h1>Optik Kağıdı Oluştur ve Kaydet</h1>
+        <form class="FORM1" id="inputForm">
+            <label for="girilenSayi">Soru Sayısını Giriniz:</label>
+            <input type="number" id="girilenSayi" disabled>
+            <button type="submit" disabled>Optiği oluştur</button>
+        </form>
+    
+        <div id="isaret" class="dynamic-input">
+            <label>
+                <input type="checkbox" id="adSoyadCheckbox"> Ad Soyad
+            </label>
+            <label>
+                <input type="checkbox" id="bolumCheckbox"> Bölüm
+            </label>
+            <label>
+                <input type="checkbox" id="ogrenciNoCheckbox"> Öğrenci No
+            </label>
+            <label>
+                <input type="checkbox" id="tarihSaatCheckbox"> Tarih Saat
+            </label>
+        </div>
+    
+        <div id="label">
+            <label for="harfler">Şık seçeneği</label>
+            <select id="harfler">
+                <option value="2">3-Şıklı</option>
+                <option value="3">4-Şıklı</option>
+                <option value="4" selected>5-Şıklı</option>
+            </select>
+        </div>
+    
+        <div id="radio" class="radio-buttons">
+            <label>
+                <input type="radio" name="orientation" id="verticalRadio" checked> Boyuna Yazdır
+            </label>
+            <label>
+                <input type="radio" name="orientation" id="horizontalRadio"> Enine Yazdır
+            </label>
+        </div>
+    </div>
+        <button type="button" onclick="DownloadAsImage()" id="jpg">Optik Görselini İndir</button>
+        <div id="output"></div>
+    
+        <script>
+            
+            const checkboxes = [
+                { id: "adSoyadCheckbox", placeholder: "Ad Soyad" },
+                { id: "bolumCheckbox", placeholder: "Bölüm" },
+                { id: "ogrenciNoCheckbox", placeholder: "Öğrenci No" },
+                { id: "tarihSaatCheckbox", placeholder: "Tarih Saat" }
+            ];
+    
+            const outputDiv = document.getElementById("output");
+            const girilenSayiInput = document.getElementById("girilenSayi");
+            const submitButton = document.querySelector("button[type='submit']");
+    
+            checkboxes.forEach(item => {
+                const checkbox = document.getElementById(item.id);
+                checkbox.addEventListener("change", function () {
+                    if (this.checked) {
+                        const input = document.createElement("input");
+                        input.type = "text";
+                        input.placeholder = item.placeholder;
+                        input.className = "dynamic-textbox";
+                        input.id = `${item.id}-input`;
+                        outputDiv.appendChild(input);
+                    } else {
+                        const input = document.getElementById(`${item.id}-input`);
+                        if (input) {
+                            outputDiv.removeChild(input);
+                        }
+                    }
+                    toggleFormState();
+                });
+            });
+    
+            function toggleFormState() {
+                const anyChecked = checkboxes.some(item => document.getElementById(item.id).checked);
+                girilenSayiInput.disabled = !anyChecked;
+                submitButton.disabled = !anyChecked;
+            }
+    
+            document.getElementById("inputForm").addEventListener("submit", function (event) {
+                event.preventDefault();
+                const girilenSayi = parseInt(document.getElementById("girilenSayi").value);
+                outputDiv.textContent = "";
+                checkboxes.forEach(item => {
+                    if (document.getElementById(item.id).checked) {
+                        const input = document.createElement("input");
+                        input.type = "text";
+                        input.placeholder = item.placeholder;
+                        input.className = "dynamic-textbox";
+                        input.id = `${item.id}-input`;
+                        input.disabled = false;
+                        outputDiv.appendChild(input);
+                    }
+                });
+                if (girilenSayi > 0) {
+                    let groupContainer = document.createElement("div");
+                    groupContainer.className = "group-container";
+                    outputDiv.appendChild(groupContainer);
+    
+                    for (let i = 1; i <= girilenSayi; i++) {
+                        const secilenharf = document.getElementById("harfler").value;
+                        let textRepresentation = `${i}. Ⓐ Ⓑ `;
+                        if (secilenharf === "4") {
+                            textRepresentation += "Ⓒ Ⓓ Ⓔ";
+                        } else if (secilenharf === "3") {
+                            textRepresentation += "Ⓒ Ⓓ";
+                        } else if (secilenharf === "2") {
+                            textRepresentation += "Ⓒ";
+                        }
+    
+                        if (document.getElementById("verticalRadio").checked) {
+                           
+                            if ((i - 1) % 10 === 0) {
+                                var groupColumn = document.createElement("div");
+                                groupColumn.className = "group-column";
+                                groupContainer.appendChild(groupColumn);
+                            }
+                        } else if (document.getElementById("horizontalRadio").checked) {
+                            
+                            if ((i - 1) % 5 === 0) {
+                                var groupColumn = document.createElement("div");
+                                groupColumn.className = "group-column";
+                                groupContainer.appendChild(groupColumn);
+                            }
+                        }
+    
+                        const paragraf = document.createElement("p");
+                        paragraf.textContent = textRepresentation;
+                        groupColumn.appendChild(paragraf);
+                    }
+                }
+            });
+    
+            function DownloadAsImage() {
+                html2canvas(outputDiv, { width: outputDiv.offsetWidth, height: outputDiv.offsetHeight }).then(function (canvas) {
+                    const myImage = canvas.toDataURL("image/png");
+                    const link = document.createElement("a");
+                    link.download = "optik-kagidi.png";
+                    link.href = myImage;
+                    link.click();
+                });
+            }
+        </script>
+    </body>
+    </html>   
+
+
